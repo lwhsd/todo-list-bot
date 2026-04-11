@@ -12,8 +12,8 @@ Built for personal use, deployed on fly.io.
 |---|---|
 | `/add <task>` | add a new task |
 | `/list` | today's tasks |
-| `/list done` | completed tasks |
-| `/list today` | pending tasks only |
+| `/list done` | today's completed tasks |
+| `/list pending` | today's pending tasks only |
 | `/done <id>` | mark a task as done |
 | `/clear <id>` | remove a specific task |
 | `/clear all` | remove everything |
@@ -143,4 +143,3 @@ TIMEZONE = ZoneInfo("Asia/Jakarta")
 
 - Tasks are scoped per `chat_id` — each chat has its own isolated list
 - Soft delete is enabled by default; tasks are flagged `is_deleted` rather than removed immediately
-- `drop_pending_updates` is on in development so stale commands don't replay after a restart. Set `ENV=production` to turn it off
