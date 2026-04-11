@@ -1,0 +1,25 @@
+# fly.toml app configuration file generated for todo-list-bot on 2026-04-10T15:51:09+07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'todo-list-bot'
+primary_region = 'sin'
+
+[build]
+
+[env]
+  ENV = 'production'
+
+[[mounts]]
+  source = 'bot_data'
+  destination = '/data'
+
+[[restart]]
+  policy = 'always'
+  max_retries = 5
+
+[[vm]]
+  memory = '256mb'
+  cpus = 1
+  memory_mb = 256
