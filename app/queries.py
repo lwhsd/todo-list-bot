@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from storage import read_tasks, update_tasks
 from config import SOFT_DELETE
 
@@ -33,6 +33,18 @@ def get_today_done_tasks(chat_id:int):
     today = _today()
     return [t for t in tasks if t['chat_id'] == chat_id and t['date'] == today and t["done"] and _is_active(t)]
 
+def get_yesterday_tasks(chat_id: int):
+    tasks = read_tasks()
+    yesterday = str(date.today() - timedelta(days=1))
+    
+    return [t for t in tasks if t['chat_id'] == chat_id and t['date'] == yesterday and _is_active(t)]
+
+def get_tomorrow_tasks(chat_id: int):
+    tasks = read_tasks()
+    tomorrow = str(date.today() + timedelta(days=1))
+    
+    return [t for t in tasks if t['chat_id'] == chat_id and t['date'] == tomorrow and _is_active(t)]
+    
 # -------------------- UPDATE DATA ----------------------------------------------------
 def store_task(task):
     

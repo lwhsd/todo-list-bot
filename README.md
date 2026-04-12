@@ -11,9 +11,12 @@ Built for personal use, deployed on fly.io.
 | command | what it does |
 |---|---|
 | `/add <task>` | add a new task |
+| `/add_next <task>` | add a new task for the next day|
 | `/list` | today's tasks |
 | `/list done` | today's completed tasks |
 | `/list pending` | today's pending tasks only |
+| `/list prev` | all yesterday's tasks|
+| `/list prev` | all tomorrow's tasks|
 | `/done <id>` | mark a task as done |
 | `/clear <id>` | remove a specific task |
 | `/clear all` | remove everything |

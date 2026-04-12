@@ -2,8 +2,21 @@
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-from datetime import date
-from queries import remove_today_tasks, remove_all_tasks, remove_done_tasks, remove_task_by_id, store_task, get_max_id, mark_as_done, get_today_pending_tasks, get_today_tasks, get_today_done_tasks
+from datetime import date, timedelta
+from queries import (
+    remove_today_tasks, 
+    remove_all_tasks, 
+    remove_done_tasks, 
+    remove_task_by_id, 
+    store_task, 
+    get_max_id, 
+    mark_as_done, 
+    get_today_pending_tasks, 
+    get_today_tasks, 
+    get_today_done_tasks,
+    get_yesterday_tasks,
+    get_tomorrow_tasks
+)
 
 logger = logging.getLogger(__name__)
 TASK_STATUS = {
@@ -19,9 +32,9 @@ _CLEAR_USAGE = (
         "/clear all"
     )
 
-_CLEAR_USAGE = (
+_LIST_USAGE = (
         "📝 <b>Usage: /list</b>\n\n"
-        "<code>/list OR /list [all|pending|done]</code>\n\n"
+        "<code>/list OR /list [all|pending|done|prev|next]</code>\n\n"
         "<b>Examples:</b>\n"
         "/list \n"
         "/list all\n"
@@ -48,6 +61,30 @@ async def add_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Task added ✅")
     else:
         await update.message.reply_text("Failed adding the task")
+
+async def add_next_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = " ".join(context.args)
+    if not text:
+        await update.message.reply_text("Usage: /add_next <task>")
+        return
+    
+    print(f'TEst add next: {text}')
+    tomorrow = str(date.today() + timedelta(days=1))
+    
+    response = store_task({
+        "id": get_max_id() + 1,
+        "chat_id": update.effective_chat.id,
+        "title": text,
+        "date": tomorrow,
+        "done": False,
+        "last_notified": None,
+        "is_deleted": False
+    })
+    
+    if response["ok"]:
+        await update.message.reply_text("Tomorrow's task added ✅")
+    else:
+        await update.message.reply_text("Failed adding the task")
     
 
 async def list_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -63,6 +100,10 @@ async def list_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             taskList = get_today_done_tasks(chat_id)
         elif arg == 'pending':
             taskList = get_today_pending_tasks(chat_id)
+        elif arg == 'prev':
+            taskList = get_yesterday_tasks(chat_id)
+        elif arg == 'next':
+            taskList = get_tomorrow_tasks(chat_id)
         else:
             raise Exception(f'Invalid param: {arg}')
         
@@ -72,7 +113,7 @@ async def list_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
         await update.message.reply_text("\n".join(f"{t['id']}. {TASK_STATUS['done'] if t['done'] else TASK_STATUS['not_started']} {t['title']}" for t in taskList))
     except Exception as e:
-        await update.message.reply_text(_CLEAR_USAGE , parse_mode='HTML')
+        await update.message.reply_text(_LIST_USAGE , parse_mode='HTML')
         
 
 async def done_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
