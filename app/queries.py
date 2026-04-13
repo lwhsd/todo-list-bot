@@ -44,6 +44,21 @@ def get_tomorrow_tasks(chat_id: int):
     tomorrow = str(date.today() + timedelta(days=1))
     
     return [t for t in tasks if t['chat_id'] == chat_id and t['date'] == tomorrow and _is_active(t)]
+
+def get_tasks(chat_id: int, target_day: str = 'today'):
+    
+    tasks = read_tasks()
+    today = date.today()
+    
+    if target_day == 'yesterday':
+        tasks_date = str(today - timedelta(days=1))
+    elif target_day == 'tomorrow':
+        tasks_date = str(today + timedelta(days=1))
+    else:
+        tasks_date = str(today)
+    
+    return [t for t in tasks if t['chat_id'] == chat_id and t['date'] == tasks_date and _is_active(t)]
+    
     
 # -------------------- UPDATE DATA ----------------------------------------------------
 def store_task(task):

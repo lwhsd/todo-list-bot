@@ -1,3 +1,4 @@
+import os
 import logging
 import traceback
 
@@ -19,13 +20,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+_DROP_PENDING = os.getenv("ENV", "development") != "production"
+
 async def _error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.error("Exception while handling update:\n%s", traceback.format_exc())
     if isinstance(update, Update) and update.effective_message:
         await update.effective_message.reply_text(
             "An internal error occurred. Please try again."
         )
-
 
 async def _post_shutdown(app) -> None:
     logger.info("Bot shut down cleanly.")
@@ -46,7 +48,7 @@ def main():
     app.add_error_handler(_error_handler)
     start_scheduler(app)
     
-    app.run_polling()
+    app.run_polling(drop_pending_updates=_DROP_PENDING)
 
 if __name__ == "__main__":
     main()

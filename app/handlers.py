@@ -11,11 +11,9 @@ from queries import (
     store_task, 
     get_max_id, 
     mark_as_done, 
-    get_today_pending_tasks, 
-    get_today_tasks, 
+    get_today_pending_tasks,
     get_today_done_tasks,
-    get_yesterday_tasks,
-    get_tomorrow_tasks
+    get_tasks
 )
 
 logger = logging.getLogger(__name__)
@@ -68,7 +66,6 @@ async def add_next_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Usage: /add_next <task>")
         return
     
-    print(f'TEst add next: {text}')
     tomorrow = str(date.today() + timedelta(days=1))
     
     response = store_task({
@@ -95,15 +92,15 @@ async def list_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         arg = context.args[0].lower() if context.args else None
         
         if arg is None or arg == "all":
-            taskList = get_today_tasks(chat_id)
+            taskList = get_tasks(chat_id=chat_id)
         elif arg == 'done':
             taskList = get_today_done_tasks(chat_id)
         elif arg == 'pending':
             taskList = get_today_pending_tasks(chat_id)
         elif arg == 'prev':
-            taskList = get_yesterday_tasks(chat_id)
+            taskList = get_tasks(chat_id=chat_id, target_day='yesterday')
         elif arg == 'next':
-            taskList = get_tomorrow_tasks(chat_id)
+            taskList = get_tasks(chat_id=chat_id, target_day='tomorrow')
         else:
             raise Exception(f'Invalid param: {arg}')
         
